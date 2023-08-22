@@ -21,7 +21,7 @@ public class AutoTest1 extends LinearOpMode {
         //robot.initTurret();
 
         //SET ORIGINAL POSITION
-        Pose2d startPose = new Pose2d(-23.80, 24.00, Math.toRadians(270.00));
+        Pose2d startPose = new Pose2d(0, -24.00, Math.toRadians(180.00));
 
         //Be sure to add drive.setPoseEstimate(new Pose2d()) to your opmode
         //before your first motion profiling matching its start pose
@@ -71,7 +71,7 @@ public class AutoTest1 extends LinearOpMode {
 
         waitForStart();
 
-        robot.followTrajectory(traj3);
+        robot.followTrajectory(traj1);
         //robot.followTrajectorySequence(traj4);
     }
 
