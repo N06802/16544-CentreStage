@@ -1,12 +1,17 @@
 package org.firstinspires.ftc.teamcode.teamcodeAuto;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.trajectorysequence.TrajectorySequence;
 
@@ -14,11 +19,13 @@ import org.firstinspires.ftc.teamcode.drive.trajectorysequence.TrajectorySequenc
 @Autonomous(name = "AutoTest1", group = "test")
 public class AutoTest1 extends LinearOpMode {
 
+    public static int TRAJECTORY = 0;
+
     @Override
     public void runOpMode() throws InterruptedException {
         SampleMecanumDrive robot = new SampleMecanumDrive(hardwareMap);
 
-        //robot.initTurret();
+        Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
         //SET ORIGINAL POSITION
         Pose2d startPose = new Pose2d(0, -24.00, Math.toRadians(180.00));
@@ -26,7 +33,6 @@ public class AutoTest1 extends LinearOpMode {
         //Be sure to add drive.setPoseEstimate(new Pose2d()) to your opmode
         //before your first motion profiling matching its start pose
         robot.setPoseEstimate(startPose);
-
 
         //wierd one
         Trajectory traj1 = robot.trajectoryBuilder(startPose)
@@ -65,14 +71,38 @@ public class AutoTest1 extends LinearOpMode {
                 .lineToConstantHeading(new Vector2d(-24.00, 24.00))
                 .build();
 
-
-
-
+        DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        DcMotorEx rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
+        DcMotorEx leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
 
         waitForStart();
 
-        robot.followTrajectory(traj1);
-        //robot.followTrajectorySequence(traj4);
+        switch (TRAJECTORY) {
+            case 1:
+                robot.followTrajectoryAsync(traj1);
+                break;
+            case 2:
+                robot.followTrajectoryAsync(traj2);
+                break;
+            case 3:
+                robot.followTrajectoryAsync(traj3);
+                break;
+            case 4:
+                robot.followTrajectorySequenceAsync(traj4);
+                break;
+        }
+
+        robot.update();
+
+        telemetry.addData("LF current", leftFront.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("LB current", leftBack.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("RF current", rightFront.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("RB current", rightBack.getCurrent(CurrentUnit.AMPS));
+
+
+
     }
+
 
 }
