@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
-import static org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit.AMPS;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ACCEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_VEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;
@@ -25,6 +24,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
@@ -48,7 +48,7 @@ import java.util.Objects;
 @Config
 @Autonomous(group = "drive")
 public class ManualFeedforwardTuner extends LinearOpMode {
-    public static double DISTANCE = 60; // in
+    public static double DISTANCE = 72; // in
 
     private FtcDashboard dashboard = FtcDashboard.getInstance();
 
@@ -76,14 +76,14 @@ public class ManualFeedforwardTuner extends LinearOpMode {
 
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, dashboard.getTelemetry());
 
+        DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        DcMotorEx rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
+        DcMotorEx leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
+
         drive = new SampleMecanumDrive(hardwareMap);
 
         final VoltageSensor voltageSensor = hardwareMap.voltageSensor.iterator().next();
-
-        DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        DcMotorEx leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
-        DcMotorEx rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
-        DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
 
         mode = Mode.TUNING_MODE;
 
@@ -133,14 +133,11 @@ public class ManualFeedforwardTuner extends LinearOpMode {
                     double currentVelo = poseVelo.getX();
 
                     // update telemetry
-                    /*telemetry.addData("targetVelocity", motionState.getV());
-                    telemetry.addData("measuredVelocity", currentVelo);
-                    telemetry.addData("error", motionState.getV() - currentVelo);*/
+                    telemetry.addData("LF current", leftFront.getCurrent(CurrentUnit.AMPS));
+                    telemetry.addData("LB current", leftBack.getCurrent(CurrentUnit.AMPS));
+                    telemetry.addData("RF current", rightFront.getCurrent(CurrentUnit.AMPS));
+                    telemetry.addData("RB current", rightBack.getCurrent(CurrentUnit.AMPS));
 
-                    telemetry.addData("LB c", leftBack.getPower());
-                    telemetry.addData("LF c", leftFront.getPower());
-                    telemetry.addData("RB c", rightBack.getPower());
-                    telemetry.addData("RF c", rightFront.getPower());
                     break;
                 case DRIVER_MODE:
                     if (gamepad1.b) {
