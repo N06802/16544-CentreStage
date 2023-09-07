@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.drive.PoseStorage;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-
+@Autonomous(name = "TelemetryTrajectoryFSM")
 public class TelemetryTrajectoryFSM extends LinearOpMode {
     enum State {
         TRAJ_1, //Runs trajectory 1
@@ -21,6 +22,7 @@ public class TelemetryTrajectoryFSM extends LinearOpMode {
         IDLE
 
     }
+    int  getState = 0;
 
     //set the current state to IDLE
     //it is the default
@@ -55,7 +57,7 @@ public class TelemetryTrajectoryFSM extends LinearOpMode {
                 .build();
 
         //define the angle at which we want to turn to during TURN_RIGHT
-        double turnAngle = -90.0;
+        double turnAngle = Math.toRadians(-90);
 
         //We create a new pose2d that takes the position at the end of traj1 one and adds the angle to it
         //this is b/c the robot will turn to -90.0 degrees before traj2 during TURN_RIGHT
@@ -74,6 +76,7 @@ public class TelemetryTrajectoryFSM extends LinearOpMode {
         //allows everything else to update in the background
         currentState = State.TRAJ_1;
         robot.followTrajectorySequenceAsync(traj1);
+        getState = 1;
 
         while (opModeIsActive() && !isStopRequested()) {
 
@@ -82,6 +85,7 @@ public class TelemetryTrajectoryFSM extends LinearOpMode {
             //in parallel. This is the basic idea for subsystems and commands.
             switch (currentState) {
                 case TRAJ_1:
+
                     //check if the robot is running a trajectory
                     //if not it will run code within
                     if (!robot.isBusy()) {
@@ -89,9 +93,13 @@ public class TelemetryTrajectoryFSM extends LinearOpMode {
                         //and run turnAsync which turns the robot to -90 degrees or 270
                         currentState = State.TURN_RIGHT;
                         robot.turnAsync(turnAngle);
+                        getState = 2;
+
                     }
+
                     break;
                 case TURN_RIGHT:
+
                     //check if the robot is running a trajectory
                     //if not it will run code within
                     if(!robot.isBusy()) {
@@ -102,14 +110,17 @@ public class TelemetryTrajectoryFSM extends LinearOpMode {
                     }
                     break;
                 case TRAJ_2:
+
                     //check if the robot is running a trajectory
                     //if not it will run code within
                     if(!robot.isBusy()){
                         //set the state to IDLE
                         currentState = State.IDLE;
+                        getState = 3;
                     }
                     break;
                 case IDLE:
+                    getState = 0;
                     //this is the end of the trajectories for the robot to follow
                     //so the robot does nothing in IDLE
                     break;
@@ -129,6 +140,7 @@ public class TelemetryTrajectoryFSM extends LinearOpMode {
             telemetry.addData("LF Current", leftFront.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("RB Current", rightBack.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("RF Current", rightFront.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("State", getState);
             telemetry.update();
         }
     }

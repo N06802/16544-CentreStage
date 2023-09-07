@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.drive.PoseStorage;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveCancelable;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-
+@Autonomous(name = "CancelableTrajectoryFSM")
 public class CancelableTrajectoryFSM extends LinearOpMode {
     enum State {
         TRAJ_1, //Runs trajectory 1
@@ -67,14 +68,15 @@ public class CancelableTrajectoryFSM extends LinearOpMode {
                 .splineTo(new Vector2d(9.93, -37.86), Math.toRadians(-90.00))
                 .build();
 
-        //Specify the amount of time until the robot will exit the traj
-        // and created the timer
-        double waitTime = 3.0;
-        ElapsedTime stopTimer = new ElapsedTime();
+
 
         telemetry.addLine("Press start when ready.");
 
         waitForStart();
+        
+        //Specify the amount of time until the robot will exit the traj
+        // and created the timer
+        ElapsedTime stopTimer = new ElapsedTime();
 
         telemetry.addLine("Robot will now exit in the trajectory in 3 seconds.");
 
@@ -125,7 +127,7 @@ public class CancelableTrajectoryFSM extends LinearOpMode {
                     break;
             }
 
-            if (stopTimer.seconds() >= 3) {
+            if (stopTimer.seconds() >= 1) {
                 //set state too idle so it wont run
                 //anymore trajectories
                 currentState = State.IDLE;

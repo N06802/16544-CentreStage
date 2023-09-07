@@ -52,7 +52,7 @@ public class AutoBreakTrajectory extends LinearOpMode {
 
         while (opModeIsActive() && !isStopRequested()) {
             // 3 seconds into the opmode, we cancel the following
-            if (stopTimer.seconds() >= 3) {
+            if (stopTimer.seconds() >= 1) {
                 // Cancel following
                 drive.breakFollowing();
 
